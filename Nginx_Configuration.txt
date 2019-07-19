@@ -1,0 +1,103 @@
+server{
+        charset utf-8;
+
+        listen 80;
+
+        server_name mitienda.com;
+        root /var/www/mitienda.com;
+        index index.php;
+
+        access_log /var/www/mitienda.com/logs/access.log combined;
+        error_log /var/www/mitienda.com/logs/error.log error;
+
+        location = /favicon.ico {
+                log_not_found off;
+                access_log off;
+        }
+
+        location = /robots.txt {
+                auth_basic off;
+                allow all;
+                log_not_found off;
+                access_log off;
+        }
+
+        location ~ /\. {
+                deny all;
+                access_log off;
+                log_not_found off;
+        }
+	
+	try_files $uri $uri/ /index.php?$args;
+	
+	gzip on;
+    gzip_disable "msie6";                                             
+    gzip_vary on;                                                     
+    gzip_types application/json text/css application/javascript;      
+    gzip_proxied any;
+    gzip_comp_level 6;                                                
+    gzip_buffers 16 8k;                                               
+    gzip_http_version 1.0; 
+	
+	rewrite ^/api/?(.*)$ /webservice/dispatcher.php?url=$1 last;
+    rewrite "^/c/([0-9]+)(\-[_a-zA-Z0-9-]*)/(.*)\.jpg$" /img/c/$1$2.jpg last;
+    rewrite "^/c/([_a-zA-Z-]+)/(.*)\.jpg$" /img/c/$1.jpg last;
+    rewrite "^/([a-z0-9]+)\-([a-z0-9]+)(\-[_a-zA-Z0-9-]*)/(\P{M}\p{M}*)*\.jpg$" /img/p/$1-$2$3.jpg last;
+    rewrite "^/([0-9]+)\-([0-9]+)/(\P{M}\p{M}*)*\.jpg$" /img/p/$1-$2.jpg last;
+    rewrite "^/([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$1$2.jpg last;
+    rewrite "^/([0-9])([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$2/$1$2$3.jpg last;
+    rewrite "^/([0-9])([0-9])([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$2/$3/$1$2$3$4.jpg last;
+    rewrite "^/([0-9])([0-9])([0-9])([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$2/$3/$4/$1$2$3$4$5.jpg last;
+    rewrite "^/([0-9])([0-9])([0-9])([0-9])([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$2/$3/$4/$5/$1$2$3$4$5$6.jpg last;
+    rewrite "^/([0-9])([0-9])([0-9])([0-9])([0-9])([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$2/$3/$4/$5/$6/$1$2$3$4$5$6$7.jpg last;
+    rewrite "^/([0-9])([0-9])([0-9])([0-9])([0-9])([0-9])([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$2/$3/$4/$5/$6/$7/$1$2$3$4$5$6$7$8.jpg last;
+    rewrite "^/([0-9])([0-9])([0-9])([0-9])([0-9])([0-9])([0-9])([0-9])(\-[_a-zA-Z0-9-]*)?/(\P{M}\p{M}*)*\.jpg$" /img/p/$1/$2/$3/$4/$5/$6/$7/$8/$1$2$3$4$5$6$7$8$9.jpg last;
+    rewrite "^/([0-9]+)\-(\P{M}\p{M}*)+\.html(.*)$" /index.php?controller=product&id_product=$1$3 last;
+    rewrite "^/([0-9]+)\-([a-zA-Z0-9-]*)(.*)$" /index.php?controller=category&id_category=$1$3 last;
+    rewrite "^/([a-zA-Z0-9-]*)/([0-9]+)\-([a-zA-Z0-9-]*)\.html(.*)$" /index.php?controller=product&id_product=$2$4 last;
+    rewrite "^/([0-9]+)__([a-zA-Z0-9-]*)(.*)$" /index.php?controller=supplier&id_supplier=$1$3 last;
+    rewrite "^/([0-9]+)_([a-zA-Z0-9-]*)(.*)$" /index.php?controller=manufacturer&id_manufacturer=$1$3 last;
+    rewrite "^/content/([0-9]+)\-([a-zA-Z0-9-]*)(.*)$" /index.php?controller=cms&id_cms=$1$3 last;
+    rewrite "^/content/category/([0-9]+)\-([a-zA-Z0-9-]*)(.*)$" /index.php?controller=cms&id_cms_category=$1$3 last;
+    rewrite "^/module/([_a-zA-Z0-9-]*)/([_a-zA-Z0-9-]*)$" /index.php?fc=module&module=$1&controller=$2 last;
+    rewrite "^/stock/([_a-zA-Z0-9-]*)/([_a-zA-Z0-9-]*)$" /index.php?controller=$1$2 last;
+
+    # Symfony controllers Specific for 1.7
+
+    set $admin_dir /adminxxxx; #CAMBIAR AQUI
+
+    location ~ /(international|_profiler|module|product|combination|specific-price)/(.*)$ {
+        try_files $uri $uri/ /index.php?q=$uri&$args $admin_dir/index.php$is_args$args;
+    }
+
+    location /adminxxxx { #CAMBIAR AQUI
+        if (!-e $request_filename) {
+            rewrite ^/.*$ /adminxxxx/index.php last; #CAMBIAR AQUI
+        }
+    }
+	
+	location / {
+        if (!-e $request_filename) {
+            rewrite ^/.*$ /index.php last;
+        }
+    }
+	
+	location ~ .php$ {
+        fastcgi_split_path_info ^(.+.php)(/.*)$;
+		try_files $uri =404;
+        fastcgi_keep_conn on;
+        include /etc/nginx/fastcgi_params;
+        #fastcgi_pass 127.0.0.1:9002;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_read_timeout 60m;
+        fastcgi_send_timeout 60m;
+        fastcgi_buffer_size 128k;
+		fastcgi_buffers 256 16k;
+        fastcgi_max_temp_file_size 0;
+        fastcgi_busy_buffers_size 256k;
+        fastcgi_temp_file_write_size 256k;
+        #include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.0-fpm.sock;
+    }
+}

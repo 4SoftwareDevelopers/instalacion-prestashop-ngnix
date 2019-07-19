@@ -1,0 +1,35 @@
+- Debe autenticarse por SSH al servidor en la nube con usuario con privilegios de administrador. (SO Debian 9)
+Los comandos pueden variar según la distro
+
+Comandos:
+
+sudo apt update && sudo apt upgrade
+sudo apt install php7.0 php7.0-fpm php7.0-xml php7.0-zip php7.0-curl php7.0-mysql php7.0-gd php7.0-intl php7.2-mbstring  
+sudo apt install mysql-server
+php -version
+mysql -V
+sudo apt install nginx
+wget [URL_DESCARGA_ARCHIVO_PRESTASHOP]
+apt install unzip
+unzip [NOMBRE_ARCHIVO_DESCARGADO_PRESTASHOP].zip
+cd /var/www
+sudo mkdir nombresitio.com
+cd 
+sudo mv index.php install_Prestashop.html prestashop.zip /var/www/nombresitio.com/
+cd /var/www/nombresitio.com
+sudo mkdir logs
+cd logs
+sudo touch access.log error.log
+cd ..
+sudo unzip prestashop.zip
+sudo find /var/www/nombresitio.com/ -exec chown www-data:www-data {} \;
+sudo nano /etc/nginx/sites-availables/nombresitio.com
+--COPIAMOS Y PEGAMOS CONTENIDO DE CONFIGURACIÓN DEL SITIO Y GUARDAMOS CON CTRL + O--
+sudo ln -s /etc/nginx/sites-availables/nombresitio.com /etc/nginx/sites-enabled/nombresitio.com
+sudo service nginx reload
+sudo service nginx restart
+--CONFIGURAMOS NUESTRA TIENDA VIA WEB--
+cd /var/www/nombresitio.com
+sudo rm -rf install
+
+Enjoy! :) A partir de este punto ya puedes personalizar tu tienda como desees y necesites.
