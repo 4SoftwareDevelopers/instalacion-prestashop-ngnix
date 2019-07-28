@@ -1,0 +1,18 @@
+sudo nano /etc/nginx/sites-available/sitio.com
+sudo nano /etc/apt/sources.list
+
+Agregamos las lineas al final: 
+
+deb http://deb.debian.org/debian stretch-backports main contrib non-free
+deb-src http://deb.debian.org/debian stretch-backports main contrib non-free
+
+sudo apt update
+sudo apt install python-certbot-nginx -t stretch-backports
+sudo nano /etc/nginx/sites-available/sitio.com 
+--VERIFICAR QUE SERVER_NAME ESTE DEFINIDO CORRECTAMENTE--
+sudo service nginx reload
+sudo service nginx restart
+
+sudo certbot --nginx -d sitio.com
+
+--VALIDAR SITIO A NIVEL WEB Y SUS CONFIGURACIONES SSL QUE SE ENCUENTREN HABILITADAS--
